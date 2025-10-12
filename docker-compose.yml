@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    image: php:8.2-apache
+    container_name: fin_app
+    volumes:
+      - ./app:/var/www/html
+      - ./data:/var/www/html/data
+    expose:
+      - "80"
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:latest
+    container_name: fin_caddy
+    ports:
+      - "8094:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:

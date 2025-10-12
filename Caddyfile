@@ -1,0 +1,12 @@
+:8094 {
+  root * /var/www/html
+  php_fastcgi app:80
+  file_server
+
+  header {
+    Cross-Origin-Opener-Policy "same-origin"
+    Cross-Origin-Embedder-Policy "require-corp"
+    X-Frame-Options "DENY"
+    Referrer-Policy "strict-origin-when-cross-origin"
+  }
+}
