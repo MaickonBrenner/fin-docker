@@ -12,3 +12,24 @@
 
 ## 🛠️ Tecnologias Utilizadas
 - Docker – containerização e portabilidade
+
+## 📦 Instalação
+### Linux
+ Em um terminal Linux, digite os seguintes comandos: <br>
+ ```
+ git clone https://github.com/MaickonBrenner/fin-docker.git
+ cd findocker
+ docker-compose up -d
+ ```
+### Windows
+ No CMD do Windows, digite:
+ ```
+ git clone https://github.com/MaickonBrenner/fin-docker.git
+ cd findocker
+ docker-compose up -d
+ ```
+## 📌 Roadmap
+- [x] Publicação do projeto
+- [ ] Dashboard financeiro
+- [ ] Categorias e metas
+- [ ] Exportação de relatórios
