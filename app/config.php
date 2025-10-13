@@ -50,5 +50,6 @@ $dados = $stmt->fetch(PDO::FETCH_ASSOC);
       </form>
     </main>
   </div>
+  <script src="js/main.js"></script>
 </body>
 </html>
