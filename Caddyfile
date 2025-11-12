@@ -1,7 +1,8 @@
-:8094 {
+:80 {
   root * /var/www/html
   php_fastcgi app:80
   file_server
+  try_files {path} /index.html
 
   header {
     Cross-Origin-Opener-Policy "same-origin"

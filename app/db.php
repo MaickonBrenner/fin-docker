@@ -1,5 +1,7 @@
 <?php
-$db = new PDO('sqlite:/var/www/html/data/financas.db');
+# $db = new PDO('sqlite:/var/www/html/data/financas.db');
+$db = new PDO('sqlite:/app_data/financas.db');
+
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 $db->exec("CREATE TABLE IF NOT EXISTS transacoes (
@@ -17,8 +19,8 @@ $db->exec("CREATE TABLE IF NOT EXISTS categorias (
 
 $db->exec("CREATE TABLE IF NOT EXISTS usuario (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  nome TEXT,
-  senha TEXT,
-  receita_mensal REAL
+  nome TEXT UNIQUE NOT NULL,
+  senha TEXT NOT NULL,
+  receita_mensal REAL DEFAULT 0
 )");
 ?>

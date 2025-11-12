@@ -1,15 +1,28 @@
 <?php
-    session_start();
-    include 'db.php';
+session_start();
+include 'db.php';
 
-    // Simulação de login (substituir por validação real depois)
-    if (!isset($_SESSION['usuario'])) {
-    $_SESSION['usuario'] = 'maickon'; // temporário
-    }
+if (!isset($_SESSION['usuario'])) {
+  header('Location: index.html');
+  exit;
+}
 
-    // Obter mês atual
-    setlocale(LC_TIME, 'pt_BR.UTF-8');
-    $mesAtual = strftime('%B de %Y');
+$usuario = $_SESSION['usuario'];
+
+// Obter dados do usuário
+$stmt = $db->prepare("SELECT receita_mensal FROM usuario WHERE nome = ?");
+$stmt->execute([$usuario]);
+$receita = $stmt->fetchColumn();
+
+// Obter mês atual
+setlocale(LC_TIME, 'pt_BR.UTF-8');
+$mesAtual = strftime('%B de %Y');
+
+// Calcular gasto atual do mês
+$mesFiltro = date('Y-m');
+$stmt = $db->prepare("SELECT SUM(valor) FROM transacoes WHERE strftime('%Y-%m', data) = ?");
+$stmt->execute([$mesFiltro]);
+$gastoAtual = $stmt->fetchColumn() ?: 0;
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -33,7 +46,7 @@
     </aside>
 
     <main class="content">
-      <h1>Olá, <?php echo $_SESSION['usuario']; ?>!</h1>
+      <h1>Olá, <?php echo htmlspecialchars($usuario); ?>!</h1>
       <p>Estamos em <strong><?php echo ucfirst($mesAtual); ?></strong></p>
 
       <button class="btn-add">+ Adicionar Despesa</button>
@@ -42,31 +55,31 @@
         <input type="text" name="descricao" placeholder="Descrição da despesa" required>
         <input type="number" step="0.01" name="valor" placeholder="Valor (R$)" required>
         <select name="categoria">
-            <?php
+          <?php
             $categorias = $db->query("SELECT nome FROM categorias")->fetchAll(PDO::FETCH_COLUMN);
             foreach ($categorias as $cat) {
-                echo "<option value='$cat'>$cat</option>";
+              echo "<option value='$cat'>$cat</option>";
             }
-            ?>
+          ?>
         </select>
         <button type="submit">Salvar despesa</button>
-    </form>
-
+      </form>
 
       <div class="painel">
         <div class="card">
           <h3>Receita Mensal</h3>
-          <p>R$ 3.000,00</p> <!-- Substituir por valor real -->
+          <p>R$ <?php echo number_format($receita, 2, ',', '.'); ?></p>
         </div>
         <div class="card">
           <h3>Gasto Atual</h3>
-          <p>R$ 1.250,00</p> <!-- Substituir por cálculo real -->
+          <p>R$ <?php echo number_format($gastoAtual, 2, ',', '.'); ?></p>
         </div>
       </div>
 
       <canvas id="graficoMensal" height="100"></canvas>
     </main>
   </div>
+
   <script src="js/main.js"></script>
   <script src="js/dashboard.js"></script>
 </body>
