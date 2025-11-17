@@ -8,6 +8,7 @@ $db->exec("CREATE TABLE IF NOT EXISTS transacoes (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   descricao TEXT,
   valor REAL,
+  categoria TEXT,
   tipo TEXT,
   data TEXT
 )");

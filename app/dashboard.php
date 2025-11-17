@@ -27,16 +27,17 @@ $saldo = $receita - $totalGasto;
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard - fin-docker</title>
+  <title>Dashboard - FinDocker</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="layout">
     <aside class="sidebar">
-      <h2>fin-docker</h2>
+      <h2>FinDocker</h2>
       <nav>
         <a href="home.php">🏠 Início</a>
+        <a href="despesas.php">💸 Despesas</a>
         <a href="dashboard.php">📊 Dashboard</a>
         <a href="categorias.php">📁 Categorias</a>
         <a href="config.php">⚙️ Configurações</a>

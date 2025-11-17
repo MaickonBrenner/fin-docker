@@ -23,9 +23,10 @@ $dados = $stmt->fetch(PDO::FETCH_ASSOC);
 <body>
   <div class="layout">
     <aside class="sidebar">
-      <h2>fin-docker</h2>
+      <h2>FinDocker</h2>
       <nav>
         <a href="home.php">🏠 Início</a>
+        <a href="despesas.php">💸 Despesas</a>
         <a href="dashboard.php">📊 Dashboard</a>
         <a href="categorias.php">📁 Categorias</a>
         <a href="config.php">⚙️ Configurações</a>

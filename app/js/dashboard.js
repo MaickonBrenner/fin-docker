@@ -3,10 +3,10 @@ const ctx = document.getElementById('graficoMensal').getContext('2d');
 new Chart(ctx, {
   type: 'bar',
   data: {
-    labels: ['01', '05', '10', '15', '20', '25', '30'],
+    labels: labels, // vindo do PHP
     datasets: [{
       label: 'Gastos (R$)',
-      data: [120, 300, 150, 400, 200, 180, 250],
+      data: valores, // vindo do PHP
       backgroundColor: '#03dac6'
     }]
   },

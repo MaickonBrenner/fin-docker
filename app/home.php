@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db.php';
+include __DIR__ . '/db.php';
 
 if (!isset($_SESSION['usuario'])) {
   header('Location: index.html');
@@ -9,35 +9,62 @@ if (!isset($_SESSION['usuario'])) {
 
 $usuario = $_SESSION['usuario'];
 
-// Obter dados do usuário
+// Receita mensal do usuário
 $stmt = $db->prepare("SELECT receita_mensal FROM usuario WHERE nome = ?");
 $stmt->execute([$usuario]);
-$receita = $stmt->fetchColumn();
+$receita = $stmt->fetchColumn() ?: 0;
 
-// Obter mês atual
-setlocale(LC_TIME, 'pt_BR.UTF-8');
-$mesAtual = strftime('%B de %Y');
+// Tradução manual dos meses
+$meses = [
+  'January' => 'Janeiro', 'February' => 'Fevereiro', 'March' => 'Março',
+  'April' => 'Abril', 'May' => 'Maio', 'June' => 'Junho',
+  'July' => 'Julho', 'August' => 'Agosto', 'September' => 'Setembro',
+  'October' => 'Outubro', 'November' => 'Novembro', 'December' => 'Dezembro'
+];
+$mesAtual = $meses[date('F')] . ' de ' . date('Y');
 
-// Calcular gasto atual do mês
+// Gasto atual do mês
 $mesFiltro = date('Y-m');
 $stmt = $db->prepare("SELECT SUM(valor) FROM transacoes WHERE strftime('%Y-%m', data) = ?");
 $stmt->execute([$mesFiltro]);
 $gastoAtual = $stmt->fetchColumn() ?: 0;
+
+// Últimas 10 despesas
+$stmt = $db->prepare("SELECT * FROM transacoes ORDER BY data DESC LIMIT 10");
+$stmt->execute();
+$ultimasDespesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Categorias
+$categorias = $db->query("SELECT nome FROM categorias")->fetchAll(PDO::FETCH_COLUMN);
+
+// Gastos por dia para o gráfico
+$stmt = $db->prepare("
+  SELECT strftime('%d', data) AS dia, SUM(valor) AS total
+  FROM transacoes
+  WHERE strftime('%Y-%m', data) = ?
+  GROUP BY dia
+  ORDER BY dia
+");
+$stmt->execute([$mesFiltro]);
+$gastosPorDia = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$labels = array_column($gastosPorDia, 'dia');
+$valores = array_column($gastosPorDia, 'total');
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard - fin-docker</title>
+  <title>Home - FinDocker</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="layout">
     <aside class="sidebar">
-      <h2>fin-docker</h2>
+      <h2>FinDocker</h2>
       <nav>
         <a href="home.php">🏠 Início</a>
+        <a href="despesas.php">💸 Despesas</a>
         <a href="dashboard.php">📊 Dashboard</a>
         <a href="categorias.php">📁 Categorias</a>
         <a href="config.php">⚙️ Configurações</a>
@@ -46,40 +73,69 @@ $gastoAtual = $stmt->fetchColumn() ?: 0;
     </aside>
 
     <main class="content">
-      <h1>Olá, <?php echo htmlspecialchars($usuario); ?>!</h1>
-      <p>Estamos em <strong><?php echo ucfirst($mesAtual); ?></strong></p>
+      <h1>Olá, <?= htmlspecialchars($usuario); ?>!</h1>
+      <p>Estamos em <strong><?= ucfirst($mesAtual); ?></strong></p>
 
-      <button class="btn-add">+ Adicionar Despesa</button>
-
-      <form action="api/transacoes.php" method="POST" class="form-despesa">
-        <input type="text" name="descricao" placeholder="Descrição da despesa" required>
-        <input type="number" step="0.01" name="valor" placeholder="Valor (R$)" required>
-        <select name="categoria">
-          <?php
-            $categorias = $db->query("SELECT nome FROM categorias")->fetchAll(PDO::FETCH_COLUMN);
-            foreach ($categorias as $cat) {
-              echo "<option value='$cat'>$cat</option>";
-            }
-          ?>
-        </select>
-        <button type="submit">Salvar despesa</button>
-      </form>
-
+      <!-- Painel resumo -->
       <div class="painel">
         <div class="card">
           <h3>Receita Mensal</h3>
-          <p>R$ <?php echo number_format($receita, 2, ',', '.'); ?></p>
+          <p>R$ <?= number_format($receita, 2, ',', '.'); ?></p>
         </div>
         <div class="card">
           <h3>Gasto Atual</h3>
-          <p>R$ <?php echo number_format($gastoAtual, 2, ',', '.'); ?></p>
+          <p>R$ <?= number_format($gastoAtual, 2, ',', '.'); ?></p>
         </div>
       </div>
 
+      <!-- Formulário rápido -->
+      <h2>Adicionar despesa</h2>
+      <form action="api/transacoes.php?action=create" method="POST" class="form-despesa">
+        <input type="text" name="descricao" placeholder="Descrição da despesa" required>
+        <input type="number" step="0.01" name="valor" placeholder="Valor (R$)" required>
+        <select name="categoria">
+          <?php foreach ($categorias as $cat): ?>
+            <option value="<?= htmlspecialchars($cat) ?>"><?= htmlspecialchars($cat) ?></option>
+          <?php endforeach; ?>
+        </select>
+        <input type="date" name="data" required>
+        <button type="submit">Salvar despesa</button>
+      </form>
+
+      <!-- Últimas despesas -->
+      <h2>Últimas despesas</h2>
+      <table class="tabela-despesas estilizada">
+        <thead>
+          <tr>
+            <th>Descrição</th>
+            <th>Valor</th>
+            <th>Categoria</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($ultimasDespesas as $d): ?>
+            <?php $classeValor = $d['valor'] >= 500 ? 'alto' : 'baixo'; ?>
+            <tr>
+              <td><?= htmlspecialchars($d['descricao']) ?></td>
+              <td class="<?= $classeValor ?>">R$ <?= number_format($d['valor'], 2, ',', '.') ?></td>
+              <td><span class="categoria"><?= htmlspecialchars($d['categoria']) ?></span></td>
+              <td><?= date('d/m/Y', strtotime($d['data'])) ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+
+      <!-- Gráfico -->
       <canvas id="graficoMensal" height="100"></canvas>
     </main>
   </div>
 
+  <!-- Passar dados PHP para JS -->
+  <script>
+    const labels = <?= json_encode($labels) ?>;
+    const valores = <?= json_encode($valores) ?>;
+  </script>
   <script src="js/main.js"></script>
   <script src="js/dashboard.js"></script>
 </body>
