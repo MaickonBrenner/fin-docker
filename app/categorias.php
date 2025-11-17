@@ -8,7 +8,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Categorias - fin-docker</title>
+  <title>Categorias - FinDocker</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>

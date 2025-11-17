@@ -17,7 +17,7 @@ $dados = $stmt->fetch(PDO::FETCH_ASSOC);
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Configurações - fin-docker</title>
+  <title>Configurações - FinDocker</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
