@@ -10,8 +10,11 @@ $db->exec("CREATE TABLE IF NOT EXISTS transacoes (
   valor REAL,
   categoria TEXT,
   tipo TEXT,
-  data TEXT
+  data TEXT,
+  usuario_id INTEGER,
+  FOREIGN KEY(usuario_id) REFERENCES usuario(id)
 )");
+
 
 $db->exec("CREATE TABLE IF NOT EXISTS categorias (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

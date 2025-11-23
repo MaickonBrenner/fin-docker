@@ -8,15 +8,25 @@ if (!$usuario) {
   exit;
 }
 
-// Receita mensal
-$stmt = $db->prepare("SELECT receita_mensal FROM usuario WHERE nome = ?");
+// Buscar ID do usuário logado
+$stmt = $db->prepare("SELECT id FROM usuario WHERE nome = ?");
 $stmt->execute([$usuario]);
+$usuarioId = $stmt->fetchColumn();
+
+// Receita mensal
+$stmt = $db->prepare("SELECT receita_mensal FROM usuario WHERE id = ?");
+$stmt->execute([$usuarioId]);
 $receita = $stmt->fetchColumn();
 
 // Filtro de mês
 $mesSelecionado = $_GET['mes'] ?? date('Y-m');
-$stmt = $db->prepare("SELECT categoria, SUM(valor) as total FROM transacoes WHERE strftime('%Y-%m', data) = ? GROUP BY categoria");
-$stmt->execute([$mesSelecionado]);
+
+// Gastos por categoria do usuário
+$stmt = $db->prepare("SELECT categoria, SUM(valor) as total 
+                      FROM transacoes 
+                      WHERE strftime('%Y-%m', data) = ? AND usuario_id = ?
+                      GROUP BY categoria");
+$stmt->execute([$mesSelecionado, $usuarioId]);
 $gastosPorCategoria = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Gasto total

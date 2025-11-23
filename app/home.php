@@ -2,16 +2,17 @@
 session_start();
 include __DIR__ . '/db.php';
 
-if (!isset($_SESSION['usuario'])) {
+if (!isset($_SESSION['usuario']) || !isset($_SESSION['usuario_id'])) {
   header('Location: index.html');
   exit;
 }
 
 $usuario = $_SESSION['usuario'];
+$usuarioId = $_SESSION['usuario_id'];
 
 // Receita mensal do usuário
-$stmt = $db->prepare("SELECT receita_mensal FROM usuario WHERE nome = ?");
-$stmt->execute([$usuario]);
+$stmt = $db->prepare("SELECT receita_mensal FROM usuario WHERE id = ?");
+$stmt->execute([$usuarioId]);
 $receita = $stmt->fetchColumn() ?: 0;
 
 // Tradução manual dos meses
@@ -23,29 +24,29 @@ $meses = [
 ];
 $mesAtual = $meses[date('F')] . ' de ' . date('Y');
 
-// Gasto atual do mês
+// Gasto atual do mês (filtrado pelo usuário)
 $mesFiltro = date('Y-m');
-$stmt = $db->prepare("SELECT SUM(valor) FROM transacoes WHERE strftime('%Y-%m', data) = ?");
-$stmt->execute([$mesFiltro]);
+$stmt = $db->prepare("SELECT SUM(valor) FROM transacoes WHERE strftime('%Y-%m', data) = ? AND usuario_id = ?");
+$stmt->execute([$mesFiltro, $usuarioId]);
 $gastoAtual = $stmt->fetchColumn() ?: 0;
 
-// Últimas 10 despesas
-$stmt = $db->prepare("SELECT * FROM transacoes ORDER BY data DESC LIMIT 10");
-$stmt->execute();
+// Últimas 10 despesas do usuário
+$stmt = $db->prepare("SELECT * FROM transacoes WHERE usuario_id = ? ORDER BY data DESC LIMIT 10");
+$stmt->execute([$usuarioId]);
 $ultimasDespesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Categorias
 $categorias = $db->query("SELECT nome FROM categorias")->fetchAll(PDO::FETCH_COLUMN);
 
-// Gastos por dia para o gráfico
+// Gastos por dia para o gráfico (filtrado pelo usuário)
 $stmt = $db->prepare("
   SELECT strftime('%d', data) AS dia, SUM(valor) AS total
   FROM transacoes
-  WHERE strftime('%Y-%m', data) = ?
+  WHERE strftime('%Y-%m', data) = ? AND usuario_id = ?
   GROUP BY dia
   ORDER BY dia
 ");
-$stmt->execute([$mesFiltro]);
+$stmt->execute([$mesFiltro, $usuarioId]);
 $gastosPorDia = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $labels = array_column($gastosPorDia, 'dia');
 $valores = array_column($gastosPorDia, 'total');

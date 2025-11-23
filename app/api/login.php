@@ -11,7 +11,10 @@ if ($usuario && $senha) {
   $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
   if ($user) {
+    // Salvar tanto o nome quanto o ID na sessão
     $_SESSION['usuario'] = $user['nome'];
+    $_SESSION['usuario_id'] = $user['id'];
+
     header('Location: ../home.php');
     exit;
   } else {
