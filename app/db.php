@@ -1,5 +1,5 @@
 <?php
-# $db = new PDO('sqlite:/var/www/html/data/financas.db');
+
 $db = new PDO('sqlite:/app_data/financas.db');
 
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -9,12 +9,11 @@ $db->exec("CREATE TABLE IF NOT EXISTS transacoes (
   descricao TEXT,
   valor REAL,
   categoria TEXT,
-  tipo TEXT,
+  tipo_pagamento TEXT,
   data TEXT,
   usuario_id INTEGER,
   FOREIGN KEY(usuario_id) REFERENCES usuario(id)
 )");
-
 
 $db->exec("CREATE TABLE IF NOT EXISTS categorias (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

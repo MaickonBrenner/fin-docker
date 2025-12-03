@@ -46,24 +46,38 @@ $categorias = $db->query("SELECT nome FROM categorias")->fetchAll(PDO::FETCH_COL
     <main class="content">
       <h1>Despesas de <?= htmlspecialchars($usuario); ?></h1>
 
+      <!-- Formulário de criação -->
       <form action="api/transacoes.php?action=create" method="POST" class="form-despesa">
         <input type="text" name="descricao" placeholder="Descrição da despesa" required>
         <input type="number" step="0.01" name="valor" placeholder="Valor (R$)" required>
-        <select name="categoria">
+        
+        <!-- Categoria -->
+        <select name="categoria" required>
           <?php foreach ($categorias as $cat): ?>
             <option value="<?= htmlspecialchars($cat) ?>"><?= htmlspecialchars($cat) ?></option>
           <?php endforeach; ?>
         </select>
+
+        <!-- Tipo de pagamento -->
+        <select name="tipo_pagamento" required>
+          <option value="Dinheiro">Dinheiro</option>
+          <option value="Cartão">Cartão</option>
+          <option value="Pix">Pix</option>
+          <option value="Boleto">Boleto</option>
+        </select>
+
         <input type="date" name="data" required>
         <button type="submit">Adicionar despesa</button>
       </form>
 
+      <!-- Tabela de despesas -->
       <table class="tabela-despesas">
         <thead>
           <tr>
             <th>Descrição</th>
             <th>Valor</th>
             <th>Categoria</th>
+            <th>Tipo de Pagamento</th> 
             <th>Data</th>
             <th>Ações</th>
           </tr>
@@ -74,6 +88,7 @@ $categorias = $db->query("SELECT nome FROM categorias")->fetchAll(PDO::FETCH_COL
               <td><?= htmlspecialchars($t['descricao']) ?></td>
               <td>R$ <?= number_format($t['valor'], 2, ',', '.') ?></td>
               <td><?= htmlspecialchars($t['categoria']) ?></td>
+              <td><?= htmlspecialchars($t['tipo_pagamento']) ?></td>
               <td><?= date('d/m/Y', strtotime($t['data'])) ?></td>
               <td>
                 <form action="api/transacoes.php?action=update" method="POST" style="display:inline;">
@@ -81,6 +96,12 @@ $categorias = $db->query("SELECT nome FROM categorias")->fetchAll(PDO::FETCH_COL
                   <input type="text" name="descricao" value="<?= htmlspecialchars($t['descricao']) ?>">
                   <input type="number" step="0.01" name="valor" value="<?= $t['valor'] ?>">
                   <input type="text" name="categoria" value="<?= htmlspecialchars($t['categoria']) ?>">
+                  <select name="tipo_pagamento">
+                    <option value="Dinheiro" <?= $t['tipo_pagamento']=='Dinheiro'?'selected':'' ?>>Dinheiro</option>
+                    <option value="Cartão" <?= $t['tipo_pagamento']=='Cartão'?'selected':'' ?>>Cartão</option>
+                    <option value="Pix" <?= $t['tipo_pagamento']=='Pix'?'selected':'' ?>>Pix</option>
+                    <option value="Boleto" <?= $t['tipo_pagamento']=='Boleto'?'selected':'' ?>>Boleto</option>
+                  </select>
                   <input type="date" name="data" value="<?= $t['data'] ?>">
                   <button type="submit">Salvar</button>
                 </form>

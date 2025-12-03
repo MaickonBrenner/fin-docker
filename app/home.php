@@ -89,20 +89,6 @@ $valores = array_column($gastosPorDia, 'total');
         </div>
       </div>
 
-      <!-- Formulário rápido -->
-      <h2>Adicionar despesa</h2>
-      <form action="api/transacoes.php?action=create" method="POST" class="form-despesa">
-        <input type="text" name="descricao" placeholder="Descrição da despesa" required>
-        <input type="number" step="0.01" name="valor" placeholder="Valor (R$)" required>
-        <select name="categoria">
-          <?php foreach ($categorias as $cat): ?>
-            <option value="<?= htmlspecialchars($cat) ?>"><?= htmlspecialchars($cat) ?></option>
-          <?php endforeach; ?>
-        </select>
-        <input type="date" name="data" required>
-        <button type="submit">Salvar despesa</button>
-      </form>
-
       <!-- Últimas despesas -->
       <h2>Últimas despesas</h2>
       <table class="tabela-despesas estilizada">

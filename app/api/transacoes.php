@@ -21,12 +21,14 @@ switch ($action) {
     $descricao = $_POST['descricao'] ?? '';
     $valor = $_POST['valor'] ?? 0;
     $categoria = $_POST['categoria'] ?? '';
+    $tipoPagamento = $_POST['tipo_pagamento'] ?? '';
     $data = $_POST['data'] ?? date('Y-m-d');
 
-    $stmt = $db->prepare("INSERT INTO transacoes (descricao, valor, categoria, data, usuario_id) 
-                          VALUES (?, ?, ?, ?, ?)");
-    $stmt->execute([$descricao, $valor, $categoria, $data, $usuarioId]);
+    $stmt = $db->prepare("INSERT INTO transacoes (descricao, valor, categoria, tipo_pagamento, data, usuario_id)
+                      VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$descricao, $valor, $categoria, $tipoPagamento, $data, $usuarioId]);
 
+    echo "<script>alert('Despesa adicionada com sucesso!'); window.location.href='../despesas.php';</script>";
     header('Location: ../despesas.php');
     break;
 
@@ -36,12 +38,14 @@ switch ($action) {
     $descricao = $_POST['descricao'] ?? '';
     $valor = $_POST['valor'] ?? 0;
     $categoria = $_POST['categoria'] ?? '';
+    $tipoPagamento = $_POST['tipo_pagamento'] ?? '';
     $data = $_POST['data'] ?? date('Y-m-d');
 
     $stmt = $db->prepare("UPDATE transacoes 
-                          SET descricao = ?, valor = ?, categoria = ?, data = ? 
-                          WHERE id = ? AND usuario_id = ?");
-    $stmt->execute([$descricao, $valor, $categoria, $data, $id, $usuarioId]);
+                      SET descricao = ?, valor = ?, categoria = ?, tipo_pagamento = ?, data = ? 
+                      WHERE id = ? AND usuario_id = ?");
+    $stmt->execute([$descricao, $valor, $categoria, $tipoPagamento, $data, $id, $usuarioId]);
+
 
     header('Location: ../despesas.php');
     break;
