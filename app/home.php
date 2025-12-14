@@ -30,8 +30,15 @@ $stmt = $db->prepare("SELECT SUM(valor) FROM transacoes WHERE strftime('%Y-%m', 
 $stmt->execute([$mesFiltro, $usuarioId]);
 $gastoAtual = $stmt->fetchColumn() ?: 0;
 
-// Últimas 10 despesas do usuário
-$stmt = $db->prepare("SELECT * FROM transacoes WHERE usuario_id = ? ORDER BY data DESC LIMIT 10");
+// Últimas 10 despesas do usuário no mês atual
+$stmt = $db->prepare("
+    SELECT * FROM transacoes 
+    WHERE usuario_id = ?
+      AND strftime('%m', data) = strftime('%m', 'now')
+      AND strftime('%Y', data) = strftime('%Y', 'now')
+    ORDER BY data DESC
+    LIMIT 20
+");
 $stmt->execute([$usuarioId]);
 $ultimasDespesas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

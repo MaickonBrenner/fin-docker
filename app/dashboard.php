@@ -91,7 +91,31 @@ $saldo = $receita - $totalGasto;
         labels: <?php echo json_encode(array_column($gastosPorCategoria, 'categoria')); ?>,
         datasets: [{
           data: <?php echo json_encode(array_column($gastosPorCategoria, 'total')); ?>,
-          backgroundColor: ['#03dac6', '#ff6b6b', '#ffd54f', '#64b5f6', '#81c784']
+          backgroundColor: [
+            '#03dac6', // azul água (original)
+            '#ff6b6b', // vermelho suave (original)
+            '#ffd54f', // amarelo (original)
+            '#64b5f6', // azul claro (original)
+            '#81c784', // verde suave (original)
+
+            '#ba68c8', // roxo médio
+            '#4db6ac', // verde água
+            '#ff8a65', // laranja queimado
+            '#9575cd', // roxo pastel
+            '#4fc3f7', // azul céu
+
+            '#aed581', // verde limão suave
+            '#f06292', // rosa vibrante
+            '#7986cb', // azul arroxeado
+            '#e57373', // vermelho claro
+            '#fff176', // amarelo pastel
+
+            '#90caf9', // azul bebê
+            '#a1887f', // marrom acinzentado
+            '#ce93d8', // lilás
+            '#ffb74d', // laranja suave
+            '#69f0ae'  // verde neon suave
+          ]
         }]
       },
       options: {
