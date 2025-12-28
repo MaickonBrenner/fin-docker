@@ -30,6 +30,6 @@
  ```
 ## 📌 Roadmap
 - [x] Publicação do projeto
-- [ ] Dashboard financeiro
+- [X] Dashboard financeiro
 - [ ] Categorias e metas
 - [ ] Exportação de relatórios
